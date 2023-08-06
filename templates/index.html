@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/style.css">
+    <title>Jeopardy Practice</title>
+</head>
+<body>
+    <div class="container">
+        <img src="../static/jeopardy-logo.jpg" alt="Jeopardy" class="logo">
+        <!--todo - message-->
+        <div>
+            <h3>Question</h3>
+        </div>
+        <form action="/submit" method="POST">
+            <div class="form-group">
+                <h3>Answer</h3>
+                <h5>What is....</h5>
+                <input
+                type="text"
+                name="answer"
+                />
+            </div>
+        </form>
+        {% if message %}
+        <p class="message">{{ message | safe }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
+
+<script>
+
+</script>
