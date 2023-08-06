@@ -11,26 +11,53 @@
     <div class="container">
         <img src="../static/jeopardy-logo.jpg" alt="Jeopardy" class="logo">
         <!--todo - message-->
-        <div>
-            <h3>Question</h3>
-        </div>
         <form action="/submit" method="POST">
             <div class="form-group">
-                <h3>Answer</h3>
+                <h3>Category</h3>
+                {{ data [0][5] }}
+                <h3>Question</h3>
+                {{ data[0][-2] }}
+
                 <h5>What is....</h5>
                 <input
                 type="text"
                 name="answer"
                 />
+
+                <h3>Answer</h3>
+                <div>
+                    <!-- <button id="showAnswer" onclick = "showAnswer()" type="button">Click to reveal answer</button>  -->
+
+                    <button id="showAnswer" onclick = "myFunction()" type="button">Click to reveal answer</button> 
+                </div>
+                <h5 id="answerH"> {{ data[0][-1] }} </h5>
+
+                {% if data == answer%} 
+                <p class="message">{{incorrect | safe}}</p>
+                {% endif %}
             </div>
         </form>
         {% if message %}
         <p class="message">{{ message | safe }}</p>
         {% endif %}
+        <div>
+            <button type="button">Generate another question</button> 
+        </div>
     </div>
+
 </body>
 </html>
 
 <script>
+    function myFunction() {
+  document.getElementById("answerH").style.display = "block";
+    }
 
+    function showAnswer() {
+    var answerDiv = document.getElementById("answerDiv");
+        answerDiv.style.display = "inline-block";
+    } else {
+        answerDiv.style.display = "none";
+    }
+}
 </script>
