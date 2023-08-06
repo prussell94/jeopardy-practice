@@ -66,30 +66,6 @@ def index():
 
 @app.route('/submit', methods=['POST'])
 def submit():
-    # # Connect to the database
-    # conn = psycopg2.connect(database="test_db",
-    #                         user="root",
-    #                         password="root",
-    #                         host="localhost", port="5432")
-  
-    # # create a cursor
-    # cur = conn.cursor()
-  
-    # # Select all products from the table
-    # cur.execute('''SELECT
-	# * FROM clues OFFSET floor(random() * (
-	# 	SELECT
-	# 		COUNT(*)
-	# 		FROM clues))
-    # LIMIT 1;''')
-  
-    # # Fetch the data
-    # data = cur.fetchall()
-    # print(data[0][-1])
-  
-    # # close the cursor and connection
-    # cur.close()
-    # conn.close()
     data = session.get("answer_data",None)
     if request.method == 'POST':
         answer= request.form['answer']

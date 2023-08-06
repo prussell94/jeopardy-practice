@@ -1,6 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script>
+    $('button').click(function() {
+        location.reload();
+    });
+    function reload() {
+        location.reload();
+    }
+    function showAns() {
+      document.getElementById("answerH").style.display = "block";
+    }
+// $(document).ready(function(){
+//   $("div").click(function(){
+//     $(this).hide();
+//   });
+// });
+</script>
+    <!-- <script>
+        $(document).ready(function(){
+            $("div").click(function(){
+            $(this).hide();
+            });
+        });
+    //     function showAns() {
+    //   document.getElementById("answerH").style.display = "block";
+    //     }
+
+    </script> -->
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,7 +56,7 @@
                 <div>
                     <!-- <button id="showAnswer" onclick = "showAnswer()" type="button">Click to reveal answer</button>  -->
 
-                    <button id="showAnswer" onclick = "myFunction()" type="button">Click to reveal answer</button> 
+                    <button id="showAnswer" onclick = "showAns()" type="button">Click to reveal answer</button> 
                 </div>
                 <h5 id="answerH"> {{ data[0][-1] }} </h5>
 
@@ -41,23 +69,9 @@
         <p class="message">{{ message | safe }}</p>
         {% endif %}
         <div>
-            <button type="button">Generate another question</button> 
+            <button id="anotherQuestion" onclick = "reload()" type="button">Generate another question</button> 
         </div>
     </div>
 
 </body>
 </html>
-
-<script>
-    function myFunction() {
-  document.getElementById("answerH").style.display = "block";
-    }
-
-    function showAnswer() {
-    var answerDiv = document.getElementById("answerDiv");
-        answerDiv.style.display = "inline-block";
-    } else {
-        answerDiv.style.display = "none";
-    }
-}
-</script>
