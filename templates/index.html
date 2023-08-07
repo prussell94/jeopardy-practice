@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script>
+    $('button').click(function() {
+        location.reload();
+    });
+    function reload() {
+        location.reload();
+    }
+    function showAns() {
+      document.getElementById("answerH").style.display = "block";
+    }
+// $(document).ready(function(){
+//   $("div").click(function(){
+//     $(this).hide();
+//   });
+// });
+</script>
+    <!-- <script>
+        $(document).ready(function(){
+            $("div").click(function(){
+            $(this).hide();
+            });
+        });
+    //     function showAns() {
+    //   document.getElementById("answerH").style.display = "block";
+    //     }
+
+    </script> -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/style.css">
+    <title>Jeopardy Practice</title>
+</head>
+<body>
+    <div class="container">
+        <img src="../static/jeopardy-logo.jpg" alt="Jeopardy" class="logo">
+        <!--todo - message-->
+        <form action="/submit" method="POST">
+            <div class="form-group">
+                <h3>Category</h3>
+                {{ data [0][5] }}
+                <h3>Question</h3>
+                {{ data[0][-2] }}
+
+                <h5>What is....</h5>
+                <input
+                type="text"
+                name="answer"
+                />
+
+                <h3>Answer</h3>
+                <div>
+                    <!-- <button id="showAnswer" onclick = "showAnswer()" type="button">Click to reveal answer</button>  -->
+
+                    <button id="showAnswer" onclick = "showAns()" type="button">Click to reveal answer</button> 
+                </div>
+                <h5 id="answerH"> {{ data[0][-1] }} </h5>
+
+                {% if data == answer%} 
+                <p class="message">{{incorrect | safe}}</p>
+                {% endif %}
+            </div>
+        </form>
+        {% if message %}
+        <p class="message">{{ message | safe }}</p>
+        {% endif %}
+        <div>
+            <button id="anotherQuestion" onclick = "reload()" type="button">Generate another question</button> 
+        </div>
+    </div>
+
+</body>
+</html>
