@@ -81,7 +81,7 @@ def submit():
         isAnswerCorrect = answer == correctAnswer
         category = data[0][5]
 
-            # Connect to the database
+        # Connect to the database
         conn = psycopg2.connect(database="test_db",
                             user="root",
                             password="root",
