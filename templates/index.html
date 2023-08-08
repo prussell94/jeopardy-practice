@@ -1,23 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-<script>
-    $('button').click(function() {
-        location.reload();
-    });
-    function reload() {
-        location.reload();
-    }
-    function showAns() {
-      document.getElementById("answerH").style.display = "block";
-    }
-// $(document).ready(function(){
-//   $("div").click(function(){
-//     $(this).hide();
-//   });
-// });
-</script>
     <!-- <script>
         $(document).ready(function(){
             $("div").click(function(){
@@ -92,41 +75,72 @@
           </form>
     </div> 
     <div class="container">
+
         <img src="../static/jeopardy-logo.jpg" alt="Jeopardy" class="logo">
+
         <!--todo - message-->
-        <form action="/submit" method="POST">
+        <!-- <input id="answerForm" type="text" />
+        <input type="button" onclick = "showAnsButton()" value="Submit"/> -->
+        <!-- <form action="/", onsubmit = "showAnsButton()" id="answerForm" method="POST"> -->
             <div class="form-group">
                 <h3>Category</h3>
-                {{ data [0][5] }}
+                {{ data[0][5] }}
                 <h3>Question</h3>
                 {{ data[0][-2] }}
 
                 <h5>What is....</h5>
-                <input
-                type="text"
-                name="answer"
-                />
-
+                <form action-="/" method="POST" id="answerForm">
+                    <input name="answer" id="givenAnswer"><br><br>
+                    <input type="submit" value="Submit">
+                    {% if message %}
+                    <button id="showAnswer" onclick = "showAns()" type="button">Click to reveal answer</button>
+                    <h5 id="answerH"> {{ data[0][-1] }} </h5>
+                    <p class="message">{{ message | safe }}</p>
+                    {% endif %}
+                </form>                
+                <!-- <p> {{ message }} </p> -->
                 <h3>Answer</h3>
                 <div>
-                    <!-- <button id="showAnswer" onclick = "showAnswer()" type="button">Click to reveal answer</button>  -->
-
-                    <button id="showAnswer" onclick = "showAns()" type="button">Click to reveal answer</button> 
                 </div>
-                <h5 id="answerH"> {{ data[0][-1] }} </h5>
-
-                {% if data == answer%} 
-                <p class="message">{{incorrect | safe}}</p>
-                {% endif %}
             </div>
-        </form>
-        {% if message %}
+        <!-- </form> -->
+        <!-- {% if message %}
         <p class="message">{{ message | safe }}</p>
-        {% endif %}
+        {% endif %} -->
         <div>
             <button id="anotherQuestion" onclick = "reload()" type="button">Generate another question</button> 
         </div>
     </div>
 
 </body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+<script>
+    // $('button').click(function() {
+    //     location.reload();
+    // });
+    function reload() {
+        location.reload();
+    }
+    function showAns() {
+      document.getElementById("answerH").style.display = "block";
+    }
+    function showAnsButton() {
+        document.getElementById("showAnswer").style.display = "block";
+        return false;
+    }
+
+    // var form = document.getElementById("")
+    var answerButton = document.getElementById("answerForm");
+    var showAnswerButton = document.getElementById("showAnswer");
+    answerButton.addEventListener("click",function(e){ 
+        showAnswerButton.style.display = "block"
+        // e.preventDefault();
+    });
+
+// $(document).ready(function(){
+//   $("div").click(function(){
+//     $(this).hide();
+//   });
+// });
+</script>
 </html>

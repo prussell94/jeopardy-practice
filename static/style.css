@@ -67,8 +67,16 @@ textarea {
 	border: 1px solid #ccc;
 }
 
+#showAnswer {
+    display: block;
+}
+
 #answerH {
     display: none;
+}
+
+#answerCorrect {
+    background-color: aquamarine;
 }
 
 .btn {

@@ -77,13 +77,11 @@ def index():
     # cur.execute('''select distinct categorytitle from clues group by categorytitle order by categorytitle desc;''')
     cur.execute('''select distinct categorytitle from clues order by categorytitle desc;''')
 
-
     categories = cur.fetchall()
   
     # # close the cursor and connection
     cur.close()
     conn.close()
-    print(categories)
     session['answer_data'] = data
     session['seasons'] = seasons
     session['clue_values'] = clue_values
@@ -124,7 +122,7 @@ def index():
 #     conn.close()
 
 
-@app.route('/submit', methods=['POST'])
+@app.route('/', methods=['POST'])
 def submit():
     data = session.get("answer_data",None)
     if request.method == 'POST':
@@ -132,10 +130,8 @@ def submit():
         correctAnswer = data[0][-1]
         question = data[0][-2]
         question_id = data[0][0]
-        answer=answer.lower().replace('the ', '')
+        # answer=answer.lower().replace('the ', '')
         correctAnswer=correctAnswer.lower().replace('the ', '')
-        print(answer)
-        print(correctAnswer)
         isAnswerCorrect = answer == correctAnswer
         category = data[0][5]
 
