@@ -132,6 +132,10 @@ def submit():
         correctAnswer = data[0][-1]
         question = data[0][-2]
         question_id = data[0][0]
+        answer=answer.lower().replace('the ', '')
+        correctAnswer=correctAnswer.lower().replace('the ', '')
+        print(answer)
+        print(correctAnswer)
         isAnswerCorrect = answer == correctAnswer
         category = data[0][5]
 
