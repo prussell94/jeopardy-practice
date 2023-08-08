@@ -25,7 +25,7 @@ class User_Answer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
     question_id = db.Column(db.Integer)
-    given_question = db.Column(db.String(200), unique=True)
+    given_question = db.Column(db.String(200))
     user_answer = db.Column(db.String(200))
     correct_answer = db.Column(db.String(200))
     is_user_correct = db.Column(db.Boolean)
@@ -60,15 +60,67 @@ def index():
 			FROM clues))
     LIMIT 1;''')
   
-    # Fetch the data
+    # # Fetch the data
     data = cur.fetchall()
+
+    # Select all products from the table
+    cur.execute('''SELECT DISTINCT * from seasons
+        order by start_date;''')
   
-    # close the cursor and connection
+    # Fetch the data
+    seasons = cur.fetchall()
+
+    cur.execute('''select DISTINCT value from clues order by value asc;''')
+
+    clue_values = cur.fetchall()
+
+    cur.execute('''select distinct categorytitle from clues group by categorytitle order by categorytitle desc;''')
+
+    categories = cur.fetchall()
+  
+    # # close the cursor and connection
     cur.close()
     conn.close()
+    print(categories)
     session['answer_data'] = data
+    session['seasons'] = seasons
+    session['clue_values'] = clue_values
+    # session['categories'] = categoriesL
     # return Flask.redirect(Flask.url_for('submit'))
-    return render_template('index.html', data=data)
+    return render_template('index.html', data=data, seasons=seasons, clue_values=clue_values, categories=categories)
+    # return render_template('index.html', data=data)
+
+
+# @app.route('/filter', methods=['POST'])
+# def filter():
+#     from_season=request.form['from season']
+#     to_season=request.form['to season']
+
+#         # Connect to the database
+#     conn = psycopg2.connect(database="test_db",
+#                             user="root",
+#                             password="root",
+#                             host="localhost", port="5432")
+  
+#     # create a cursor
+#     cur = conn.cursor()
+  
+#     # Select all products from the table
+#     cur.execute('''SELECT
+# 	* FROM clues OFFSET floor(random() * (
+# 		SELECT
+# 			COUNT(*)
+# 			FROM clues
+#                 WHERE ))
+#     LIMIT 1;''')
+  
+#     # Fetch the data
+#     data = cur.fetchall()
+  
+#     # close the cursor and connection
+#     cur.close()
+#     conn.close()
+
 
 @app.route('/submit', methods=['POST'])
 def submit():
@@ -91,8 +143,8 @@ def submit():
         cur = conn.cursor()
 
         cur.execute(
-            "INSERT INTO user_answer (given_question, user_answer, user_id, question_id, correct_answer, is_user_correct, category) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-              (question, answer, 1, question_id, correctAnswer, isAnswerCorrect, category))
+            "INSERT INTO user_answer (user_answer, given_question, user_id, question_id, correct_answer, is_user_correct, category) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+              (answer, question, 1, question_id, correctAnswer, isAnswerCorrect, category))
     
         conn.commit()
 
