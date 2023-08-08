@@ -36,6 +36,59 @@
     <title>Jeopardy Practice</title>
 </head>
 <body>
+    <div class="filter_container">
+        <form>
+            <h5>Filter by:</h5>
+            <label for="from season">From Season</label>
+            <select name="from season" id="from_season">
+            {% for season in seasons %}
+                    <option>{{season[1]}}</option>
+            {% endfor %}
+            </select>
+            <label for="to season">To Season</label>
+            <select name="to season" id="to_season">
+                {% for season in seasons %}
+                    <option>{{season[1]}}</option>
+                {% endfor %}
+            </select>
+            <!-- <label for="browser">Choose your browser from the list:</label>
+            <input list="browsers" name="browser" id="browser">
+            <datalist id="browsers">
+              <option value="Edge">
+              <option value="Firefox">
+              <option value="Chrome">
+              <option value="Opera">
+              <option value="Safari">
+            </datalist> -->
+             <!-- <label for="browser">Choose your browser from the list:</label>
+            <input list="browsers" name="browser" id="browser">
+            <datalist id="browsers"> -->
+            <label for="Category">Category</label>
+            <br />
+            <input list="Categories" name="Category" id="Category">
+            <!-- <select name="Category" id="Category"> -->
+                <datalist id="Categories">
+                    {% for category in categories %}
+                        <option value={{category[0]}}>
+                    {% endfor %}
+                </datalist>
+            </select>
+            <label for="Value From">Value From</label>
+                <select name="Value From" id="Value_From">
+                {% for clue_value in clue_values %}
+                    <option>{{clue_value[0]}}</option>
+                {% endfor %}
+                </select>
+                <label for="Value To">Value To</label>
+                <select name="Value To" id="Value To">
+                {% for clue_value in clue_values %}
+                    <option>{{clue_value[0]}}</option>
+                {% endfor %}
+                </select>
+            <br><br>
+            <input type="submit" value="Filter">
+          </form>
+    </div> 
     <div class="container">
         <img src="../static/jeopardy-logo.jpg" alt="Jeopardy" class="logo">
         <!--todo - message-->
