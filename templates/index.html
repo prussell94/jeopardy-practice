@@ -69,10 +69,12 @@
             <!-- <select name="Category" id="Category"> -->
                 <datalist id="Categories">
                     {% for category in categories %}
-                        <option value={{category[0]}}>
+                        <!-- <option value={{category[0]}}> -->
+                        <option>{{category[0]}}</option>
                     {% endfor %}
                 </datalist>
             </select>
+            <br />
             <label for="Value From">Value From</label>
                 <select name="Value From" id="Value_From">
                 {% for clue_value in clue_values %}

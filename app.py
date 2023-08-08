@@ -74,7 +74,9 @@ def index():
 
     clue_values = cur.fetchall()
 
-    cur.execute('''select distinct categorytitle from clues group by categorytitle order by categorytitle desc;''')
+    # cur.execute('''select distinct categorytitle from clues group by categorytitle order by categorytitle desc;''')
+    cur.execute('''select distinct categorytitle from clues order by categorytitle desc;''')
+
 
     categories = cur.fetchall()
   
