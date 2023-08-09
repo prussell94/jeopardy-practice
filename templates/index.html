@@ -107,8 +107,11 @@
         <!-- {% if message %}
         <p class="message">{{ message | safe }}</p>
         {% endif %} -->
+
         <div>
-            <button id="anotherQuestion" onclick = "reload()" type="button">Generate another question</button> 
+            <form action="{{ url_for('index') }}">
+                <input type="submit" value="Generate Another Question" />
+            </form>
         </div>
     </div>
 

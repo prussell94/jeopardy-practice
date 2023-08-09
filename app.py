@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import psycopg2
@@ -25,7 +25,7 @@ class User_Answer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
     question_id = db.Column(db.Integer)
-    given_question = db.Column(db.String(200))
+    given_question = db.Column(db.String(400))
     user_answer = db.Column(db.String(200))
     correct_answer = db.Column(db.String(200))
     is_user_correct = db.Column(db.Boolean)
@@ -85,8 +85,6 @@ def index():
     session['answer_data'] = data
     session['seasons'] = seasons
     session['clue_values'] = clue_values
-    # session['categories'] = categoriesL
-    # return Flask.redirect(Flask.url_for('submit'))
     return render_template('index.html', data=data, seasons=seasons, clue_values=clue_values, categories=categories)
     # return render_template('index.html', data=data)
 
