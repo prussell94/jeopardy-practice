@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session
+from flask import Flask, render_template, request, session, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 import psycopg2
@@ -25,7 +25,7 @@ class User_Answer(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
     question_id = db.Column(db.Integer)
-    given_question = db.Column(db.String(200))
+    given_question = db.Column(db.String(400))
     user_answer = db.Column(db.String(200))
     correct_answer = db.Column(db.String(200))
     is_user_correct = db.Column(db.Boolean)
@@ -77,18 +77,14 @@ def index():
     # cur.execute('''select distinct categorytitle from clues group by categorytitle order by categorytitle desc;''')
     cur.execute('''select distinct categorytitle from clues order by categorytitle desc;''')
 
-
     categories = cur.fetchall()
   
     # # close the cursor and connection
     cur.close()
     conn.close()
-    print(categories)
     session['answer_data'] = data
     session['seasons'] = seasons
     session['clue_values'] = clue_values
-    # session['categories'] = categoriesL
-    # return Flask.redirect(Flask.url_for('submit'))
     return render_template('index.html', data=data, seasons=seasons, clue_values=clue_values, categories=categories)
     # return render_template('index.html', data=data)
 
@@ -124,7 +120,7 @@ def index():
 #     conn.close()
 
 
-@app.route('/submit', methods=['POST'])
+@app.route('/', methods=['POST'])
 def submit():
     data = session.get("answer_data",None)
     if request.method == 'POST':
@@ -132,6 +128,8 @@ def submit():
         correctAnswer = data[0][-1]
         question = data[0][-2]
         question_id = data[0][0]
+        # answer=answer.lower().replace('the ', '')
+        correctAnswer=correctAnswer.lower().replace('the ', '')
         isAnswerCorrect = answer == correctAnswer
         category = data[0][5]
 
