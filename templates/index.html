@@ -88,18 +88,24 @@
                 <h3>Question</h3>
                 {{ data[0][-2] }}
 
+                <h3>Answer</h3>
                 <h5>What is....</h5>
                 <form action-="/" method="POST" id="answerForm">
                     <input name="answer" id="givenAnswer"><br><br>
-                    <input type="submit" value="Submit">
+                    <div id="submitDiv">
+                        <input type="submit" id="submitAnswerButton" value="Submit">
+                    </div>
                     {% if message %}
-                    <button id="showAnswer" onclick = "showAns()" type="button">Click to reveal answer</button>
-                    <h5 id="answerH"> {{ data[0][-1] }} </h5>
-                    <p class="message">{{ message | safe }}</p>
+                        <button id="showAnswer" onclick = "showAns()" type="button">Click to reveal answer</button>
+                        <h5 id="answerH"> {{ data[0][-1].lower().replace("<", "") }} </h5>
+                        {% if message == "Correct!" %}
+                            <p id="correctMessage">{{ message | safe }}</p>
+                        {% else %}
+                            <p id="incorrectMessage">{{ message | safe }}</p>
+                        {% endif %}
                     {% endif %}
                 </form>                
                 <!-- <p> {{ message }} </p> -->
-                <h3>Answer</h3>
                 <div>
                 </div>
             </div>
@@ -124,6 +130,7 @@
     function reload() {
         location.reload();
     }
+
     function showAns() {
       document.getElementById("answerH").style.display = "block";
     }
@@ -135,15 +142,12 @@
     // var form = document.getElementById("")
     var answerButton = document.getElementById("answerForm");
     var showAnswerButton = document.getElementById("showAnswer");
+    var submitAnswerButton = document.getElementById("submitAnswerButton")
     answerButton.addEventListener("click",function(e){ 
         showAnswerButton.style.display = "block"
+        // submitAnswerButton.style.display = "none"
         // e.preventDefault();
     });
 
-// $(document).ready(function(){
-//   $("div").click(function(){
-//     $(this).hide();
-//   });
-// });
 </script>
 </html>
