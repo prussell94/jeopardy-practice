@@ -82,6 +82,7 @@ def index():
     # # close the cursor and connection
     cur.close()
     conn.close()
+
     session['answer_data'] = data
     session['seasons'] = seasons
     session['clue_values'] = clue_values
@@ -129,7 +130,7 @@ def submit():
         question = data[0][-2]
         question_id = data[0][0]
         # answer=answer.lower().replace('the ', '')
-        correctAnswer=correctAnswer.lower().replace('the ', '')
+        correctAnswer=correctAnswer.lower().replace('the ', '').replace('<', '')
         isAnswerCorrect = answer == correctAnswer
         category = data[0][5]
 
