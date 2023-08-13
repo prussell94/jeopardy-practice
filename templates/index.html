@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- <script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>    <!-- <script>
         $(document).ready(function(){
             $("div").click(function(){
             $(this).hide();
@@ -20,16 +20,16 @@
 </head>
 <body>
     <div class="filter_container">
-        <form>
+        <form action="/filtered" id="filter_form" method="POST">
             <h5>Filter by:</h5>
-            <label for="from season">From Season</label>
-            <select name="from season" id="from_season">
+            <label for="from_season">From Season</label>
+            <select name="from_season" id="from_season">
             {% for season in seasons %}
-                    <option>{{season[1]}}</option>
+                <option>{{season[1]}}</option>
             {% endfor %}
             </select>
-            <label for="to season">To Season</label>
-            <select name="to season" id="to_season">
+            <label for="to_season">To Season</label>
+            <select name="to_season" id="to_season">
                 {% for season in seasons %}
                     <option>{{season[1]}}</option>
                 {% endfor %}
@@ -48,7 +48,7 @@
             <datalist id="browsers"> -->
             <label for="Category">Category</label>
             <br />
-            <input list="Categories" name="Category" id="Category">
+            <input list="Categories" name="category" id="Category">
             <!-- <select name="Category" id="Category"> -->
                 <datalist id="Categories">
                     {% for category in categories %}
@@ -58,21 +58,23 @@
                 </datalist>
             </select>
             <br />
-            <label for="Value From">Value From</label>
-                <select name="Value From" id="Value_From">
+            <label for="value_from">Value From</label>
+                <select name="value_from" id="value_from">
                 {% for clue_value in clue_values %}
                     <option>{{clue_value[0]}}</option>
                 {% endfor %}
                 </select>
-                <label for="Value To">Value To</label>
-                <select name="Value To" id="Value To">
+                <label for="value_to">Value To</label>
+                <select name="value_to" id="value_to">
                 {% for clue_value in clue_values %}
                     <option>{{clue_value[0]}}</option>
                 {% endfor %}
                 </select>
             <br><br>
-            <input type="submit" value="Filter">
+            <input type="submit" onclick="sendData()" value="filter">
+            <button onclick="sendData()">Send Data</button>
           </form>
+          <div id="output"></div>
     </div> 
     <div class="container">
 
@@ -84,9 +86,17 @@
         <!-- <form action="/", onsubmit = "showAnsButton()" id="answerForm" method="POST"> -->
             <div class="form-group">
                 <h3>Category</h3>
-                {{ data[0][5] }}
+                {% if filtered_data %}
+                    {{ filtered_data[0][3] }}
+                {% else %}    
+                    {{ data[0][5] }}
+                {% endif %}    
                 <h3>Question</h3>
-                {{ data[0][-2] }}
+                {% if filtered_data %}
+                    {{ filtered_data[0][4] }}
+                {% else %}
+                    {{ data[0][-2] }}
+                {% endif %}    
 
                 <h3>Answer</h3>
                 <h5>What is....</h5>
@@ -97,7 +107,12 @@
                     </div>
                     {% if message %}
                         <button id="showAnswer" onclick = "showAns()" type="button">Click to reveal answer</button>
+                        {% if filtered_data %}
+                        <h5 id="answerH"> {{ filtered_data[0][-1].lower().replace("<", "") }} </h5>
+                        {% else %}    
                         <h5 id="answerH"> {{ data[0][-1].lower().replace("<", "") }} </h5>
+                        {% endif %}    
+
                         {% if message == "Correct!" %}
                             <p id="correctMessage">{{ message | safe }}</p>
                         {% else %}
@@ -121,9 +136,62 @@
         </div>
     </div>
 
-</body>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 <script>
+
+
+</script>
+</body>
+<script>
+    var form = document.getElementById("filter_form")
+    // //   var input = document.getElementById("jsvar")
+    //   form.addEventListener('submit', function(e){
+    //     // input.value = "your_var"
+    //     form.submit()
+    //   })
+
+//     form.addEventListener('submit', function(event) {
+//     event.preventDefault();    // prevent page from refreshing
+//     const formData = new FormData(form);  // grab the data inside the form fields
+//     fetch('/filtered', {   // assuming the backend is hosted on the same server
+//         method: 'POST',
+//         body: formData,
+//     }).then(function(response) {
+//         document.getElementById("showAnswer").style.display = "block";
+//         return response.text();
+//         // do something with the response if needed.
+//         // If you want the table to be built only after the backend handles the request and replies, call buildTable() here.
+//     }).catch(function(error) {
+//     console.log('error = ' + error)
+// })
+// });
+
+    function sendData() {
+            event.preventDefault();    // prevent page from refreshing
+
+            var form = document.getElementById("filter_form")
+            console.log("testing---------ajax")
+
+            var from_season_value = document.getElementById('from_season').value;
+            var to_season_value = document.getElementById("to_season").value;
+            var category_value = document.getElementById("Category").value;
+            var value_from_value = document.getElementById("value_from").value;
+            var value_to_value = document.getElementById("value_to").value;
+
+            $.ajax({
+                url: '/process-filter',
+                type: 'POST',
+                // data: {'from_season': from_season_value},
+                data: {'from_season': from_season_value, 'to_season': to_season_value, 'category': category_value, 'from_value': value_from_value,
+                    'to_value': value_to_value},
+                success: function(response) {
+                    form.style.backgroundColor = "red"
+                    document.getElementById('output').innerHTML = response;
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
     // $('button').click(function() {
     //     location.reload();
     // });
