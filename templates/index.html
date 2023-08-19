@@ -24,14 +24,14 @@
             <h5>Filter by:</h5>
             <label for="from_season">From Season</label>
             <select name="from_season" id="from_season">
-            {% for season in seasons %}
-                <option>{{season[1]}}</option>
+            {% for season in seasons.keys() %}
+                <option>{{season}}</option>
             {% endfor %}
             </select>
             <label for="to_season">To Season</label>
             <select name="to_season" id="to_season">
-                {% for season in seasons %}
-                    <option>{{season[1]}}</option>
+                {% for season in seasons.keys() %}
+                    <option>{{season}}</option>
                 {% endfor %}
             </select>
             <!-- <label for="browser">Choose your browser from the list:</label>
@@ -85,18 +85,44 @@
         <input type="button" onclick = "showAnsButton()" value="Submit"/> -->
         <!-- <form action="/", onsubmit = "showAnsButton()" id="answerForm" method="POST"> -->
             <div class="form-group">
-                <h3>Category</h3>
+                <h3>Season</h3>
+                <div id="seasonDiv">
                 {% if filtered_data %}
+                    {{ filtered_data }}
+                    {{ filtered_data[0][-1] }}
+                {% else %} 
+                    {{ data }}
+                    {{ data[0][-1] }}
+                {% endif %}
+                </div>
+                <h3>Value</h3>
+                <div id="valueDiv">
+                {% if filtered_data %}
+                    {{ filtered_data }}
+                    {{ filtered_data[0][2] }}
+                {% else %} 
+                    {{ data }}
+                    {{ data[0][2] }}
+                {% endif %}
+                </div>
+                <h3>Category</h3>
+                <div id="categoryDiv">
+                {% if filtered_data %}
+                    {{ filtered_data }}
                     {{ filtered_data[0][3] }}
-                {% else %}    
+                {% else %} 
+                    {{ data }}
                     {{ data[0][5] }}
-                {% endif %}    
+                {% endif %}
+                </div>    
                 <h3>Question</h3>
+                <div id="questionDiv">
                 {% if filtered_data %}
                     {{ filtered_data[0][4] }}
                 {% else %}
-                    {{ data[0][-2] }}
+                    {{ data[0][4]}}
                 {% endif %}    
+                </div>
 
                 <h3>Answer</h3>
                 <h5>What is....</h5>
@@ -106,12 +132,14 @@
                         <input type="submit" id="submitAnswerButton" value="Submit">
                     </div>
                     {% if message %}
-                        <button id="showAnswer" onclick = "showAns()" type="button">Click to reveal answer</button>
-                        {% if filtered_data %}
-                        <h5 id="answerH"> {{ filtered_data[0][-1].lower().replace("<", "") }} </h5>
-                        {% else %}    
+                    <button id="showAnswer" onclick = "showAns()" type="button">Click to reveal answer</button>
+                    <div id="AnswerDiv">
+                    {% if filtered_data %}
+                        <h5 id="answerH"> {{ filtered_data[0][5].lower().replace("<", "") }} </h5>
+                    {% else %}   
                         <h5 id="answerH"> {{ data[0][-1].lower().replace("<", "") }} </h5>
-                        {% endif %}    
+                    {% endif %}    
+                    </div>
 
                         {% if message == "Correct!" %}
                             <p id="correctMessage">{{ message | safe }}</p>
@@ -131,7 +159,10 @@
 
         <div>
             <form action="{{ url_for('index') }}">
-                <input type="submit" value="Generate Another Question" />
+                <input type="submit" value="Generate Another Question With No Filters" />
+            </form>
+            <form action="{{ url_for('index') }}">
+                <input type="submit" onclick="sendData()" value="Generate Another Question With Current Filters" />
             </form>
         </div>
     </div>
@@ -169,7 +200,6 @@
             event.preventDefault();    // prevent page from refreshing
 
             var form = document.getElementById("filter_form")
-            console.log("testing---------ajax")
 
             var from_season_value = document.getElementById('from_season').value;
             var to_season_value = document.getElementById("to_season").value;
@@ -181,11 +211,17 @@
                 url: '/process-filter',
                 type: 'POST',
                 // data: {'from_season': from_season_value},
+                datatype: 'json',
                 data: {'from_season': from_season_value, 'to_season': to_season_value, 'category': category_value, 'from_value': value_from_value,
                     'to_value': value_to_value},
                 success: function(response) {
                     form.style.backgroundColor = "red"
-                    document.getElementById('output').innerHTML = response;
+                    document.getElementById('categoryDiv').style.backgroundColor = "red"
+                    document.getElementById('categoryDiv').innerHTML = JSON.parse(JSON.stringify(response)).category
+                    document.getElementById('questionDiv').innerHTML = JSON.parse(JSON.stringify(response)).question
+                    document.getElementById('valueDiv').innerHTML = JSON.parse(JSON.stringify(response)).value
+                    document.getElementById('seasonDiv').innerHTML = JSON.parse(JSON.stringify(response)).season
+                    document.getElementById('answerH').innerHTML = JSON.parse(JSON.stringify(response)).correctAnswer
                 },
                 error: function(error) {
                     console.log(error);
@@ -201,6 +237,7 @@
 
     function showAns() {
       document.getElementById("answerH").style.display = "block";
+      document.getElementById('answerDiv').style.display = "block";
     }
     function showAnsButton() {
         document.getElementById("showAnswer").style.display = "block";
