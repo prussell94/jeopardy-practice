@@ -62,6 +62,38 @@ class User_Answer(db.Model):
         self.is_user_correct = is_user_correct
         self.category = category
 
+@app.route('/test', methods=['GET','POST'])
+def test():
+
+    season = request.form.get("seasonI")
+    question = request.form.get("questionI")
+    category = request.form.get("categoryI")
+    UserAnswer = request.form.get("user_answerI")
+    correctAnswer = request.form.get("correct_answerI")
+    isAnswerCorrect = request.form.get("isAnswerCorrect")
+    questionId = request.form.get("questionIdI")
+
+    print("---question id-----")
+
+    print(season)
+    print(question)
+
+    # Connect to the database
+    conn = psycopg2.connect(database="test_db",
+                            user="root",
+                            password="root",
+                            host="localhost", port="5432")
+  
+    # create a cursor
+    cur = conn.cursor()
+
+    cur.execute(
+        "INSERT INTO user_answer (user_answer, given_question, user_id, question_id, correct_answer, is_user_correct, category) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+        (UserAnswer, question, 99, questionId, correctAnswer, isAnswerCorrect, category))
+    
+    conn.commit()
+
+    return {"season": season} # return the result to JavaScript
 
 @app.route('/')
 def index():
@@ -76,7 +108,7 @@ def index():
     # create a cursor
     cur = conn.cursor()
   
-    # Select all products from the table
+    # Select random question
     cur.execute('''SELECT
 	* FROM clues OFFSET floor(random() * (
 		SELECT
@@ -86,6 +118,27 @@ def index():
   
     # # Fetch the data
     data = cur.fetchall()
+
+    season = request.form.get("season")
+    question = request.form.get("question")
+    question_id = request.form.get("question_id")
+
+    print(season)
+    print(question)
+    print(question_id)
+
+    print("---quesiton id-----")
+    print(data[0][0])
+    print(data)
+
+    question_id = data[0][0]
+    print(question_id)
+
+    cur.execute('''Select season_name from clues_with_games_and_seasons_mv WHERE id = (%s);''', (question_id,))
+    # cur.execute('''Select season_name from clues_with_games_and_seasons_mv WHERE id = 123;''')
+
+    season = cur.fetchall()
+    print(season[0][0])
 
     # Select all products from the table
     cur.execute('''SELECT DISTINCT * from seasons
@@ -121,15 +174,19 @@ def index():
     session['seasons'] = seasons
     session['season_dict'] = season_dict
     session['clue_values'] = clue_values
-    return render_template('index.html', data=data, seasons=season_dict, clue_values=clue_values, categories=categories)
+    filtered_json=session['filtered_data']
+    return render_template('index.html', data=data, correctAnswer=data[0][-1], seasons=season_dict, seasonOfQuestion=season[0][0], clue_values=clue_values, categories=categories, filtered_json=filtered_json)
     # return render_template('index.html', data=data)
 
 @app.route('/process-filter', methods=['GET','POST'])
 def process_filter():
+    print("----printing -----process-filter")
     print(request.get_data)
 
     seasons = session['seasons']
     season_dict = session['season_dict']
+
+    categoryI = request.form.get("categoryI")
 
     from_season = request.form.get("from_season")
     to_season = request.form.get("to_season")
@@ -141,6 +198,8 @@ def process_filter():
     print(category)
     print(from_value)
     print(to_value)
+
+    print(categoryI)
     # print(from_season)
     # data = req# retrieve the data sent from JavaScript
     # process the data using Python code
@@ -156,6 +215,10 @@ def process_filter():
 
     print(seasons)
   
+    if from_value == '':
+        from_value=200
+    if to_value == '':
+        to_value=from_value
     # Select all products from the table
     cur.execute('''SELECT
 	* FROM clues_with_games_and_seasons_mv WHERE season_id BETWEEN (%s) AND (%s) AND value BETWEEN (%s) AND (%s) OFFSET random() * (SELECT
@@ -172,6 +235,11 @@ def process_filter():
     session['filtered_data'] = filtered_data
 
     print(filtered_data)
+
+    print("--------js filtering--------------------")
+    print(filtered_data[0][5])
+
+    
 
     data = {"category": filtered_data[0][3], "question": filtered_data[0][4], "correctAnswer": filtered_data[0][5], "value": filtered_data[0][2], "season": filtered_data[0][-1]}
     # filtered_data = [values for labels, values in data]
@@ -210,9 +278,15 @@ def index_with_filter():
 
     print('rendering mainmenu') 
 
+    data = session.get("answer_data",None)
+    print(data)
+
+
     session['filtered_data'] = filtered_data
 
     print(filtered_data)
+
+    print("--------------------in filtering-------- /filtered")
 
     return render_template("index.html", filtered_data=filtered_data, message="Correct!")
 
@@ -272,97 +346,107 @@ def process():
     result = data['value'] * 2
     return jsonify(result=result) # return the result to JavaScript
 
-@app.route('/', methods=['POST'])
-def submit():
-    data = session.get("answer_data",None)
-    filtered_data=session.get('filtered_data', None)
-    season_dict = session['season_dict']
+# @app.route('/', methods=['POST'])
+# def submit():
+#     data = session.get("answer_data",None)
+#     filtered_data=session.get('filtered_data', None)
+#     season_dict = session['season_dict']
     
-    print("---check 1")
-    print(filtered_data)
-    if request.method == 'POST':
-        answer= request.form['answer']
-        correctAnswer = data[0][-1]
-        question = data[0][-2]
-        question_id = data[0][0]
-        # answer=answer.lower().replace('the ', '')
-        correctAnswer=correctAnswer.lower().replace('the ', '').replace('<', '')
-        print(answer)
-        print(correctAnswer)
-        print(answer == correctAnswer)
-        print("oh no")
-        isAnswerCorrect = answer == correctAnswer
-        category = data[0][5]
+#     print("---check 1")
+#     print(filtered_data)
+#     if request.method == 'POST':
+#         answer= request.form['answer']
+#         correctAnswer = data[0][-1]
+#         question = data[0][-2]
+#         question_id = data[0][0]
+#         # answer=answer.lower().replace('the ', '')
+#         correctAnswer=correctAnswer.lower().replace('the ', '').replace('<', '')
+#         print(answer)
+#         print(correctAnswer)
+#         print(answer == correctAnswer)
+#         print("oh no")
+#         isAnswerCorrect = answer == correctAnswer
+#         category = data[0][5]
 
-        print('check 2-------')
-        print(filtered_data)
-        if filtered_data != None:
-            fCorrectAnswer=filtered_data[0][5]
-            fCorrectAnswer=fCorrectAnswer.lower().replace('the ', '').replace('<', '')
-            fQuestion=filtered_data[0][4]
-            fQuestion_id=filtered_data[0][0]
-            isFAnswerCorrect= answer == fCorrectAnswer
-            fCategory=filtered_data[0][3]
+#         print('check 2-------')
+#         print(filtered_data)
+#         if filtered_data != None:
+#             fCorrectAnswer=filtered_data[0][5]
+#             fCorrectAnswer=fCorrectAnswer.lower().replace('the ', '').replace('<', '')
+#             fQuestion=filtered_data[0][4]
+#             fQuestion_id=filtered_data[0][0]
+#             isFAnswerCorrect= answer == fCorrectAnswer
+#             fCategory=filtered_data[0][3]
 
-        # Connect to the database
-        conn = psycopg2.connect(database="test_db",
-                            user="root",
-                            password="root",
-                            host="localhost", port="5432")
+#         # Connect to the database
+#         conn = psycopg2.connect(database="test_db",
+#                             user="root",
+#                             password="root",
+#                             host="localhost", port="5432")
   
-        # create a cursor
-        cur = conn.cursor()
+#         # create a cursor
+#         cur = conn.cursor()
 
-        cur.execute(
-            "INSERT INTO user_answer (user_answer, given_question, user_id, question_id, correct_answer, is_user_correct, category) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-              (answer, question, 1, question_id, correctAnswer, isAnswerCorrect, category))
+#         cur.execute(
+#             "INSERT INTO user_answer (user_answer, given_question, user_id, question_id, correct_answer, is_user_correct, category) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+#               (answer, question, 99, question_id, correctAnswer, isAnswerCorrect, category))
     
-        conn.commit()
 
-        print(filtered_data)
-        print(isAnswerCorrect)
-        print(answer)
-        print(correctAnswer)
-        print(fCorrectAnswer)
-        print(isFAnswerCorrect)
-        # session['filtered_data'] = None
-        if(isFAnswerCorrect):
-            return render_template("index.html", message='Correct!', seasons=season_dict, data=data, filtered_data=filtered_data)
-        else:
-            return render_template("index.html", message='Incorrect!', seasons=season_dict, data=data, filtered_data=filtered_data)
+#         cur.execute('''Select season_name from clues_with_games_and_seasons_mv WHERE id = (%s);''', (question_id,))
+#         # cur.execute('''Select season_name from clues_with_games_and_seasons_mv WHERE id = 123;''')
+
+#         season = cur.fetchall()
+#         print(season[0][0])
         
-@app.route('/filter', methods=['POST'])
-def submit_filter():
-    data=session.get("answer_data", None)
-    if request.method == 'POST':
-        answer= request.form['answer']
-        correctAnswer = data[0][-1]
-        question = data[0][-2]
-        question_id = data[0][0]
-        # answer=answer.lower().replace('the ', '')
-        correctAnswer=correctAnswer.lower().replace('the ', '').replace('<', '')
-        isAnswerCorrect = answer == correctAnswer
-        category = data[0][5]
+#         conn.commit()
 
-        # Connect to the database
-        conn = psycopg2.connect(database="test_db",
-                            user="root",
-                            password="root",
-                            host="localhost", port="5432")
+#         print(filtered_data)
+#         print(isAnswerCorrect)
+#         print(answer)
+#         print(correctAnswer)
+#         print(fCorrectAnswer)
+#         print(isFAnswerCorrect)
+#         # session['filtered_data'] = None
+#         filtered_data=None
+#         if(isAnswerCorrect):
+#             return render_template("index.html", message='Correct!', correctAnswer=correctAnswer, seasonOfQuestion=season[0][0], seasons=season_dict, data=data, filtered_data=filtered_data)
+#         else:
+#             return render_template("index.html", message='Incorrect!', correctAnswer=correctAnswer, seasonOfQuestion=season[0][0], seasons=season_dict, data=data, filtered_data=filtered_data)
+        
+# @app.route('/filter', methods=['POST'])
+# def submit_filter():
+#     data=session.get("answer_data", None)
+#     if request.method == 'POST':
+#         answer= request.form['answer']
+#         correctAnswer = data[0][-1]
+#         question = data[0][-2]
+#         question_id = data[0][0]
+#         # answer=answer.lower().replace('the ', '')
+#         correctAnswer=correctAnswer.lower().replace('the ', '').replace('<', '')
+#         isAnswerCorrect = answer == correctAnswer
+#         category = data[0][5]
+
+#         # Connect to the database
+#         conn = psycopg2.connect(database="test_db",
+#                             user="root",
+#                             password="root",
+#                             host="localhost", port="5432")
   
-        # create a cursor
-        cur = conn.cursor()
+#         # create a cursor
+#         cur = conn.cursor()
 
-        cur.execute(
-            "INSERT INTO user_answer (user_answer, given_question, user_id, question_id, correct_answer, is_user_correct, category) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-              (answer, question, 1, question_id, correctAnswer, isAnswerCorrect, category))
+#         print("-------inserting into database user answer and correct answer----------")
+#         cur.execute(
+#             "INSERT INTO user_answer (user_answer, given_question, user_id, question_id, correct_answer, is_user_correct, category) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+#               (answer, question, 1, question_id, correctAnswer, isAnswerCorrect, category))
     
-        conn.commit()
+#         conn.commit()
 
-        if(isAnswerCorrect):
-            return render_template("index.html", message='Correct!', data=data)
-        else:
-            return render_template("index.html", message='Incorrect!', data=data)
+#         print("----------------in filtering--------------------------------")
+#         if(isAnswerCorrect):
+#             return render_template("index.html", message='Correct!', data=data)
+#         else:
+#             return render_template("index.html", message='Incorrect!', data=data)
 
 # //Use a function to put duplicate code and ensure that submit, index and filter are very similar
 if __name__ == '__main__':

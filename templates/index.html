@@ -1,17 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>    <!-- <script>
-        $(document).ready(function(){
-            $("div").click(function(){
-            $(this).hide();
-            });
-        });
-    //     function showAns() {
-    //   document.getElementById("answerH").style.display = "block";
-    //     }
-
-    </script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>    
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,18 +24,7 @@
                     <option>{{season}}</option>
                 {% endfor %}
             </select>
-            <!-- <label for="browser">Choose your browser from the list:</label>
-            <input list="browsers" name="browser" id="browser">
-            <datalist id="browsers">
-              <option value="Edge">
-              <option value="Firefox">
-              <option value="Chrome">
-              <option value="Opera">
-              <option value="Safari">
-            </datalist> -->
-             <!-- <label for="browser">Choose your browser from the list:</label>
-            <input list="browsers" name="browser" id="browser">
-            <datalist id="browsers"> -->
+
             <label for="Category">Category</label>
             <br />
             <input list="Categories" name="category" id="Category">
@@ -60,12 +39,14 @@
             <br />
             <label for="value_from">Value From</label>
                 <select name="value_from" id="value_from">
+                    <option value="" disabled selected>200</option>
                 {% for clue_value in clue_values %}
                     <option>{{clue_value[0]}}</option>
                 {% endfor %}
                 </select>
                 <label for="value_to">Value To</label>
                 <select name="value_to" id="value_to">
+                    <option value="" disabled selected>200</option>
                 {% for clue_value in clue_values %}
                     <option>{{clue_value[0]}}</option>
                 {% endfor %}
@@ -73,6 +54,7 @@
             <br><br>
             <input type="submit" onclick="sendData()" value="filter">
             <button onclick="sendData()">Send Data</button>
+            <button id="testButton">Test Button</button>
           </form>
           <div id="output"></div>
     </div> 
@@ -83,16 +65,17 @@
         <!--todo - message-->
         <!-- <input id="answerForm" type="text" />
         <input type="button" onclick = "showAnsButton()" value="Submit"/> -->
-        <!-- <form action="/", onsubmit = "showAnsButton()" id="answerForm" method="POST"> -->
             <div class="form-group">
                 <h3>Season</h3>
                 <div id="seasonDiv">
                 {% if filtered_data %}
                     {{ filtered_data }}
                     {{ filtered_data[0][-1] }}
+                    {{ seasonOfQuestion }}
+
                 {% else %} 
-                    {{ data }}
-                    {{ data[0][-1] }}
+                    <!-- {{ data }} -->
+                    {{ seasonOfQuestion }}
                 {% endif %}
                 </div>
                 <h3>Value</h3>
@@ -101,7 +84,7 @@
                     {{ filtered_data }}
                     {{ filtered_data[0][2] }}
                 {% else %} 
-                    {{ data }}
+                    <!-- {{ data }} -->
                     {{ data[0][2] }}
                 {% endif %}
                 </div>
@@ -111,7 +94,7 @@
                     {{ filtered_data }}
                     {{ filtered_data[0][3] }}
                 {% else %} 
-                    {{ data }}
+                    <!-- {{ data }} -->
                     {{ data[0][5] }}
                 {% endif %}
                 </div>    
@@ -120,19 +103,25 @@
                 {% if filtered_data %}
                     {{ filtered_data[0][4] }}
                 {% else %}
-                    {{ data[0][4]}}
-                {% endif %}    
+                    {{ data[0][6] }}
+                {% endif %}  
+                <h3>True Answer</h3>  
                 </div>
 
                 <h3>Answer</h3>
                 <h5>What is....</h5>
                 <form action-="/" method="POST" id="answerForm">
                     <input name="answer" id="givenAnswer"><br><br>
+
                     <div id="submitDiv">
-                        <input type="submit" id="submitAnswerButton" value="Submit">
+                        <input type="submit" id="submitAnswerButton" onclick="determineIfCorrect()" value="Submit">
                     </div>
+                    <div id="answerMessage">TESTING</div>
+                    <div id="aanswer"></div>
+                    
                     {% if message %}
                     <button id="showAnswer" onclick = "showAns()" type="button">Click to reveal answer</button>
+
                     <div id="AnswerDiv">
                     {% if filtered_data %}
                         <h5 id="answerH"> {{ filtered_data[0][5].lower().replace("<", "") }} </h5>
@@ -141,21 +130,13 @@
                     {% endif %}    
                     </div>
 
-                        {% if message == "Correct!" %}
-                            <p id="correctMessage">{{ message | safe }}</p>
-                        {% else %}
-                            <p id="incorrectMessage">{{ message | safe }}</p>
-                        {% endif %}
                     {% endif %}
                 </form>                
-                <!-- <p> {{ message }} </p> -->
+                <p> {{ message }} </p>
                 <div>
                 </div>
             </div>
-        <!-- </form> -->
-        <!-- {% if message %}
-        <p class="message">{{ message | safe }}</p>
-        {% endif %} -->
+        </form>
 
         <div>
             <form action="{{ url_for('index') }}">
@@ -173,28 +154,95 @@
 </script>
 </body>
 <script>
-    var form = document.getElementById("filter_form")
-    // //   var input = document.getElementById("jsvar")
-    //   form.addEventListener('submit', function(e){
-    //     // input.value = "your_var"
-    //     form.submit()
-    //   })
+    $('#testButton').click(function(event) {
+        event.preventDefault();
+        $(this).css('background-color', '#00ff00');
+    });
 
-//     form.addEventListener('submit', function(event) {
-//     event.preventDefault();    // prevent page from refreshing
-//     const formData = new FormData(form);  // grab the data inside the form fields
-//     fetch('/filtered', {   // assuming the backend is hosted on the same server
-//         method: 'POST',
-//         body: formData,
-//     }).then(function(response) {
-//         document.getElementById("showAnswer").style.display = "block";
-//         return response.text();
-//         // do something with the response if needed.
-//         // If you want the table to be built only after the backend handles the request and replies, call buildTable() here.
-//     }).catch(function(error) {
-//     console.log('error = ' + error)
-// })
-// });
+    var form = document.getElementById("filter_form")
+    var questionDiv = document.getElementById("questionDiv")
+
+    function determineIfCorrect() {
+        event.preventDefault();    // prevent page from refreshing
+        
+        // var form = document.getElementById("answerForm")
+        // form.style.backgroundColor = "blue"
+
+        var userAnswer = document.getElementById("givenAnswer").value
+        // userAnswer.style.backgroundColor = "green"
+        var correctAnswer = JSON.parse('{{ correctAnswer | tojson}}');
+        var correctFilteredAnswer = JSON.parse('{{ correctAnswer | tojson}}');
+        correctFilteredAnswer=  document.getElementById('aanswer').innerHTML;
+
+        //it's going through / route everytime as opposed to /filtered therefore set another variable in /filtered and check if that variable is present?
+        // document.getElementById("answerMessage").innerHTML = userAnswer
+
+
+        if(correctFilteredAnswer != "") {
+            if (userAnswer == correctFilteredAnswer) {
+            document.getElementById("answerMessage").innerHTML = "Correct!" + " " + userAnswer + " correct Answer " + correctFilteredAnswer
+            document.getElementById("answerMessage").style.display = "block"
+            document.getElementById("answerMessage").style.backgroundColor = "blue";
+
+            }
+            else {
+            document.getElementById("answerMessage").innerHTML = "Incorrect!" + " " + userAnswer + " The correct answer is " + correctFilteredAnswer
+            document.getElementById("answerMessage").style.display = "block"
+            document.getElementById("answerMessage").style.backgroundColor =  "red";
+            }
+        }
+        else {
+            if (userAnswer == correctAnswer) {
+            document.getElementById("answerMessage").innerHTML = "Correct answer given - " + userAnswer + " correct Answer " + correctAnswer
+            document.getElementById("answerMessage").style.display = "block"
+            document.getElementById("answerMessage").style.backgroundColor = "blue";
+
+            }
+            else {
+            document.getElementById("answerMessage").innerHTML = "Incorrect answer given - " + userAnswer + " The correct answer is " + correctAnswer
+            document.getElementById("answerMessage").style.display = "block"
+            document.getElementById("answerMessage").style.backgroundColor =  "red";
+
+            }
+        }
+
+        // var season = JSON.parse('{{ seasonOfQuestion | tojson}}');
+        var season = document.getElementById('seasonDiv').innerHTML
+        // var question = JSON.parse('{{ data[0][6] | tojson}}');
+        var question = document.getElementById('questionDiv').innerHTML
+        var questionId = JSON.parse('{{ data[0][0] | tojson}}');
+        // var userAnswer = JSON.parse('{{ correctAnswer | tojson}}');
+        // var correctAnswer = 
+        var userId = 1;
+        var category = JSON.parse('{{ data[0][5] | tojson}}');
+
+        $.ajax({
+                url: '/test',
+                type: 'POST',
+                datatype: 'json',
+                data: {'seasonI': season, 'questionI': question, "questionIdI": questionId, 'categoryI': category, 'user_idI': userId,
+                    'user_answerI': userAnswer, 'correct_answerI': correctAnswer, 'isAnswerCorrect': userAnswer == correctAnswer},
+                success: function(response) {
+                    form.style.backgroundColor = "blue"
+                    questionDiv.style.backgroundColor = "yellow"
+                    // document.getElementById('categoryDiv').style.backgroundColor = "red"
+                    // // var correctAnswer = JSON.parse(JSON.stringify(response)).correctAnswer
+                    // document.getElementById('categoryDiv').innerHTML = JSON.parse(JSON.stringify(response)).category
+                    // document.getElementById('questionDiv').innerHTML = JSON.parse(JSON.stringify(response)).question
+                    // document.getElementById('valueDiv').innerHTML = JSON.parse(JSON.stringify(response)).value
+                    // document.getElementById('seasonDiv').innerHTML = JSON.parse(JSON.stringify(response)).season
+                    // document.getElementById('aanswer').innerHTML = JSON.parse(JSON.stringify(response)).correctAnswer
+                    // document.getElementById('aanswer').style.backgroundColor = "aqua"
+                    // document.getElementById('aanswer').style.display = "block"
+
+
+                    // set a variable such that we know that filtered has returned something, then when submit check if variable is present
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+    }
 
     function sendData() {
             event.preventDefault();    // prevent page from refreshing
@@ -210,27 +258,30 @@
             $.ajax({
                 url: '/process-filter',
                 type: 'POST',
-                // data: {'from_season': from_season_value},
                 datatype: 'json',
                 data: {'from_season': from_season_value, 'to_season': to_season_value, 'category': category_value, 'from_value': value_from_value,
                     'to_value': value_to_value},
                 success: function(response) {
                     form.style.backgroundColor = "red"
                     document.getElementById('categoryDiv').style.backgroundColor = "red"
+                    // var correctAnswer = JSON.parse(JSON.stringify(response)).correctAnswer
                     document.getElementById('categoryDiv').innerHTML = JSON.parse(JSON.stringify(response)).category
                     document.getElementById('questionDiv').innerHTML = JSON.parse(JSON.stringify(response)).question
                     document.getElementById('valueDiv').innerHTML = JSON.parse(JSON.stringify(response)).value
                     document.getElementById('seasonDiv').innerHTML = JSON.parse(JSON.stringify(response)).season
-                    document.getElementById('answerH').innerHTML = JSON.parse(JSON.stringify(response)).correctAnswer
+                    document.getElementById('aanswer').innerHTML = JSON.parse(JSON.stringify(response)).correctAnswer
+                    document.getElementById('aanswer').style.backgroundColor = "aqua"
+                    document.getElementById('aanswer').style.display = "block"
+
+
+                    // set a variable such that we know that filtered has returned something, then when submit check if variable is present
                 },
                 error: function(error) {
                     console.log(error);
                 }
             });
         }
-    // $('button').click(function() {
-    //     location.reload();
-    // });
+
     function reload() {
         location.reload();
     }
@@ -244,15 +295,16 @@
         return false;
     }
 
-    // var form = document.getElementById("")
     var answerButton = document.getElementById("answerForm");
     var showAnswerButton = document.getElementById("showAnswer");
     var submitAnswerButton = document.getElementById("submitAnswerButton")
     answerButton.addEventListener("click",function(e){ 
         showAnswerButton.style.display = "block"
-        // submitAnswerButton.style.display = "none"
-        // e.preventDefault();
     });
+
+    /**
+     * put in another js function that checks if answer is correct and is triggered when user presses submit 
+     * this is meant to mean refresh does not happen automatically and thus can stay with filtered options if wanted */
 
 </script>
 </html>
