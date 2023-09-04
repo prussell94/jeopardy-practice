@@ -28,10 +28,8 @@
             <label for="Category">Category</label>
             <br />
             <input list="Categories" name="category" id="Category">
-            <!-- <select name="Category" id="Category"> -->
                 <datalist id="Categories">
                     {% for category in categories %}
-                        <!-- <option value={{category[0]}}> -->
                         <option>{{category[0]}}</option>
                     {% endfor %}
                 </datalist>
@@ -61,10 +59,6 @@
     <div class="container">
 
         <img src="../static/jeopardy-logo.jpg" alt="Jeopardy" class="logo">
-
-        <!--todo - message-->
-        <!-- <input id="answerForm" type="text" />
-        <input type="button" onclick = "showAnsButton()" value="Submit"/> -->
             <div class="form-group">
                 <h3>Season</h3>
                 <div id="seasonDiv">
@@ -72,9 +66,7 @@
                     {{ filtered_data }}
                     {{ filtered_data[0][-1] }}
                     {{ seasonOfQuestion }}
-
                 {% else %} 
-                    <!-- {{ data }} -->
                     {{ seasonOfQuestion }}
                 {% endif %}
                 </div>
@@ -84,7 +76,6 @@
                     {{ filtered_data }}
                     {{ filtered_data[0][2] }}
                 {% else %} 
-                    <!-- {{ data }} -->
                     {{ data[0][2] }}
                 {% endif %}
                 </div>
@@ -94,7 +85,6 @@
                     {{ filtered_data }}
                     {{ filtered_data[0][3] }}
                 {% else %} 
-                    <!-- {{ data }} -->
                     {{ data[0][5] }}
                 {% endif %}
                 </div>    
@@ -162,25 +152,18 @@
 
     var questionIdG;
     var correctAnswerG;
+    var filtered=false;
 
     var form = document.getElementById("filter_form")
     var questionDiv = document.getElementById("questionDiv")
 
     function determineIfCorrect() {
         event.preventDefault();    // prevent page from refreshing
-        
-        // var form = document.getElementById("answerForm")
-        // form.style.backgroundColor = "blue"
 
         var userAnswer = document.getElementById("givenAnswer").value
-        // userAnswer.style.backgroundColor = "green"
         var correctAnswer = JSON.parse('{{ correctAnswer | tojson}}');
         var correctFilteredAnswer = JSON.parse('{{ correctAnswer | tojson}}');
         correctFilteredAnswer=  document.getElementById('aanswer').innerHTML;
-
-        //it's going through / route everytime as opposed to /filtered therefore set another variable in /filtered and check if that variable is present?
-        // document.getElementById("answerMessage").innerHTML = userAnswer
-
 
         if(correctFilteredAnswer != "") {
             if (userAnswer == correctFilteredAnswer) {
@@ -200,34 +183,43 @@
             document.getElementById("answerMessage").innerHTML = "Correct answer given - " + userAnswer + " correct Answer " + correctAnswer
             document.getElementById("answerMessage").style.display = "block"
             document.getElementById("answerMessage").style.backgroundColor = "blue";
-
             }
             else {
             document.getElementById("answerMessage").innerHTML = "Incorrect answer given - " + userAnswer + " The correct answer is " + correctAnswer
             document.getElementById("answerMessage").style.display = "block"
             document.getElementById("answerMessage").style.backgroundColor =  "red";
-
             }
         }
 
-        // var season = JSON.parse('{{ seasonOfQuestion | tojson}}');
-        var season = document.getElementById('seasonDiv').innerHTML
-        // var question = JSON.parse('{{ data[0][6] | tojson}}');
-        var question = document.getElementById('questionDiv').innerHTML
-        var questionId = JSON.parse('{{ data[0][0] | tojson}}');
+        if(filtered) {
+            var season = document.getElementById('seasonDiv').innerHTML
+            var question = document.getElementById('questionDiv').innerHTML
+            var questionId = questionIdG
+            var category = document.getElementById('categoryDiv').innerHTML
+            var correctAnswer = document.getElementById('aanswer').innerHTML;
+        }
+        else {
+            var season = JSON.parse('{{ seasonOfQuestion | tojson}}');
+            var question = JSON.parse('{{ data[0][6] | tojson}}');
+            var questionId = JSON.parse('{{ data[0][0] | tojson}}');
+            var category = JSON.parse('{{ data[0][5] | tojson}}');
+            var correctAnswer = JSON.parse('{{ correctAnswer | tojson}}');
 
-        // var userAnswer = JSON.parse('{{ correctAnswer | tojson}}');
-        // var correctAnswer = 
+        }
+        // var season = document.getElementById('seasonDiv').innerHTML
+        // var question = document.getElementById('questionDiv').innerHTML
+        // var questionId = JSON.parse('{{ data[0][0] | tojson}}');
+ 
         var userId = 1;
-        var category = JSON.parse('{{ data[0][5] | tojson}}');
-        var categoryI = document.getElementById('categoryDiv').innerHTML
+        // var category = JSON.parse('{{ data[0][5] | tojson}}');
+        // var categoryI = document.getElementById('categoryDiv').innerHTML
 
         $.ajax({
                 url: '/test',
                 type: 'POST',
                 datatype: 'json',
-                data: {'seasonI': season, 'questionI': question, "questionIdI": questionIdG, 'categoryI': categoryI, 'user_idI': userId,
-                    'user_answerI': userAnswer, 'correct_answerI': correctAnswerG, 'isAnswerCorrect': userAnswer == correctAnswerG},
+                data: {'seasonI': season, 'questionI': question, "questionIdI": questionId, 'categoryI': category, 'user_idI': userId,
+                    'user_answerI': userAnswer, 'correct_answerI': correctAnswer, 'isAnswerCorrect': userAnswer == correctAnswerG},
                 success: function(response) {
                     form.style.backgroundColor = "blue"
                     questionDiv.style.backgroundColor = "yellow"
@@ -280,6 +272,7 @@
                     document.getElementById('aanswer').style.display = "block"
                     questionIdG = JSON.parse(JSON.stringify(response)).questionId
                     correctAnswerG = JSON.parse(JSON.stringify(response)).correctAnswer
+                    filtered=true;
 
 
                     // set a variable such that we know that filtered has returned something, then when submit check if variable is present
