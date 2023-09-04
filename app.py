@@ -70,6 +70,8 @@ def test():
     category = request.form.get("categoryI")
     UserAnswer = request.form.get("user_answerI")
     correctAnswer = request.form.get("correct_answerI")
+    print("please don't be the same-----------------")
+    print(correctAnswer)
     isAnswerCorrect = request.form.get("isAnswerCorrect")
     questionId = request.form.get("questionIdI")
 
@@ -77,6 +79,7 @@ def test():
 
     print(season)
     print(question)
+    print(category)
 
     # Connect to the database
     conn = psycopg2.connect(database="test_db",
@@ -246,7 +249,7 @@ def process_filter():
 
     # return render_template("index.html", filtered_data=filtered_data)
 
-    return {"category": filtered_data[0][3], "question": filtered_data[0][4], "correctAnswer": filtered_data[0][5], "value": filtered_data[0][2], "season": filtered_data[0][-1]} # return the result to JavaScript
+    return {"category": filtered_data[0][3], "questionId": filtered_data[0][0], "question": filtered_data[0][4], "correctAnswer": filtered_data[0][5], "value": filtered_data[0][2], "season": filtered_data[0][-1]} # return the result to JavaScript
 
 @app.route("/filtered",methods=["POST"]) 
 def index_with_filter():

@@ -154,10 +154,14 @@
 </script>
 </body>
 <script>
+    var filtered = false;
     $('#testButton').click(function(event) {
         event.preventDefault();
         $(this).css('background-color', '#00ff00');
     });
+
+    var questionIdG;
+    var correctAnswerG;
 
     var form = document.getElementById("filter_form")
     var questionDiv = document.getElementById("questionDiv")
@@ -211,17 +215,19 @@
         // var question = JSON.parse('{{ data[0][6] | tojson}}');
         var question = document.getElementById('questionDiv').innerHTML
         var questionId = JSON.parse('{{ data[0][0] | tojson}}');
+
         // var userAnswer = JSON.parse('{{ correctAnswer | tojson}}');
         // var correctAnswer = 
         var userId = 1;
         var category = JSON.parse('{{ data[0][5] | tojson}}');
+        var categoryI = document.getElementById('categoryDiv').innerHTML
 
         $.ajax({
                 url: '/test',
                 type: 'POST',
                 datatype: 'json',
-                data: {'seasonI': season, 'questionI': question, "questionIdI": questionId, 'categoryI': category, 'user_idI': userId,
-                    'user_answerI': userAnswer, 'correct_answerI': correctAnswer, 'isAnswerCorrect': userAnswer == correctAnswer},
+                data: {'seasonI': season, 'questionI': question, "questionIdI": questionIdG, 'categoryI': categoryI, 'user_idI': userId,
+                    'user_answerI': userAnswer, 'correct_answerI': correctAnswerG, 'isAnswerCorrect': userAnswer == correctAnswerG},
                 success: function(response) {
                     form.style.backgroundColor = "blue"
                     questionDiv.style.backgroundColor = "yellow"
@@ -272,6 +278,8 @@
                     document.getElementById('aanswer').innerHTML = JSON.parse(JSON.stringify(response)).correctAnswer
                     document.getElementById('aanswer').style.backgroundColor = "aqua"
                     document.getElementById('aanswer').style.display = "block"
+                    questionIdG = JSON.parse(JSON.stringify(response)).questionId
+                    correctAnswerG = JSON.parse(JSON.stringify(response)).correctAnswer
 
 
                     // set a variable such that we know that filtered has returned something, then when submit check if variable is present
