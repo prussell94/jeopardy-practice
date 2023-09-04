@@ -95,7 +95,6 @@
                 {% else %}
                     {{ data[0][6] }}
                 {% endif %}  
-                <h3>True Answer</h3>  
                 </div>
 
                 <h3>Answer</h3>
@@ -170,7 +169,6 @@
             document.getElementById("answerMessage").innerHTML = "Correct!" + " " + userAnswer + " correct Answer " + correctFilteredAnswer
             document.getElementById("answerMessage").style.display = "block"
             document.getElementById("answerMessage").style.backgroundColor = "blue";
-
             }
             else {
             document.getElementById("answerMessage").innerHTML = "Incorrect!" + " " + userAnswer + " The correct answer is " + correctFilteredAnswer
@@ -204,15 +202,11 @@
             var questionId = JSON.parse('{{ data[0][0] | tojson}}');
             var category = JSON.parse('{{ data[0][5] | tojson}}');
             var correctAnswer = JSON.parse('{{ correctAnswer | tojson}}');
-
         }
-        // var season = document.getElementById('seasonDiv').innerHTML
-        // var question = document.getElementById('questionDiv').innerHTML
-        // var questionId = JSON.parse('{{ data[0][0] | tojson}}');
  
         var userId = 1;
-        // var category = JSON.parse('{{ data[0][5] | tojson}}');
-        // var categoryI = document.getElementById('categoryDiv').innerHTML
+        document.getElementById('aanswer').style.display = "block"
+
 
         $.ajax({
                 url: '/test',
@@ -221,20 +215,7 @@
                 data: {'seasonI': season, 'questionI': question, "questionIdI": questionId, 'categoryI': category, 'user_idI': userId,
                     'user_answerI': userAnswer, 'correct_answerI': correctAnswer, 'isAnswerCorrect': userAnswer == correctAnswerG},
                 success: function(response) {
-                    form.style.backgroundColor = "blue"
-                    questionDiv.style.backgroundColor = "yellow"
-                    // document.getElementById('categoryDiv').style.backgroundColor = "red"
-                    // // var correctAnswer = JSON.parse(JSON.stringify(response)).correctAnswer
-                    // document.getElementById('categoryDiv').innerHTML = JSON.parse(JSON.stringify(response)).category
-                    // document.getElementById('questionDiv').innerHTML = JSON.parse(JSON.stringify(response)).question
-                    // document.getElementById('valueDiv').innerHTML = JSON.parse(JSON.stringify(response)).value
-                    // document.getElementById('seasonDiv').innerHTML = JSON.parse(JSON.stringify(response)).season
-                    // document.getElementById('aanswer').innerHTML = JSON.parse(JSON.stringify(response)).correctAnswer
-                    // document.getElementById('aanswer').style.backgroundColor = "aqua"
-                    // document.getElementById('aanswer').style.display = "block"
-
-
-                    // set a variable such that we know that filtered has returned something, then when submit check if variable is present
+                    console.log("success")
                 },
                 error: function(error) {
                     console.log(error);
@@ -260,20 +241,15 @@
                 data: {'from_season': from_season_value, 'to_season': to_season_value, 'category': category_value, 'from_value': value_from_value,
                     'to_value': value_to_value},
                 success: function(response) {
-                    form.style.backgroundColor = "red"
-                    document.getElementById('categoryDiv').style.backgroundColor = "red"
-                    // var correctAnswer = JSON.parse(JSON.stringify(response)).correctAnswer
                     document.getElementById('categoryDiv').innerHTML = JSON.parse(JSON.stringify(response)).category
                     document.getElementById('questionDiv').innerHTML = JSON.parse(JSON.stringify(response)).question
                     document.getElementById('valueDiv').innerHTML = JSON.parse(JSON.stringify(response)).value
                     document.getElementById('seasonDiv').innerHTML = JSON.parse(JSON.stringify(response)).season
                     document.getElementById('aanswer').innerHTML = JSON.parse(JSON.stringify(response)).correctAnswer
                     document.getElementById('aanswer').style.backgroundColor = "aqua"
-                    document.getElementById('aanswer').style.display = "block"
                     questionIdG = JSON.parse(JSON.stringify(response)).questionId
                     correctAnswerG = JSON.parse(JSON.stringify(response)).correctAnswer
                     filtered=true;
-
 
                     // set a variable such that we know that filtered has returned something, then when submit check if variable is present
                 },
